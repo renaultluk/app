@@ -13,6 +13,7 @@ import Alerts from './Alerts';
 import DeliveryMap from './Map';
 import BatchDetails from './BatchDetails';
 import Settings from './Settings';
+import Sign from './Sign';
 
 import colors from '../styles/colors';
 
@@ -75,6 +76,12 @@ export default function App() {
         <MainStack.Screen name="Main" component={TabPages} />
         <MainStack.Screen name="Settings"
           component={Settings} 
+          options={{
+            headerShown: true,
+          }}
+        />
+        <MainStack.Screen name="Sign"
+          component={Sign}
           options={{
             headerShown: true,
           }}

@@ -4,7 +4,7 @@ import { View, Image } from 'react-native';
 import styles from '../styles/pages/SplashScreen';
 
 const SplashScreen = ({ navigation }) => {
-    setTimeout(() => navigation.replace("Main", { screen: "Alerts" }), 3000);
+    setTimeout(() => navigation.replace("Login", { screen: "Alerts" }), 3000);
   
     return (
     <View style={styles.container}>
