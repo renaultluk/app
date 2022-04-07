@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "561386564609",
+    "firebase_url": "https://kerry-logistics-cargo-tracking-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "kerry-logistics-cargo-tracking",
+    "storage_bucket": "kerry-logistics-cargo-tracking.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561386564609:android:838d858239bf66ae5da400",
+        "android_client_info": {
+          "package_name": "com.kerry.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561386564609-2m2104265811qs7ddgdnu55ccivn8gat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1Rv7NDDbWcZDlOKZnN-84szXVc81JeB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561386564609-2m2104265811qs7ddgdnu55ccivn8gat.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

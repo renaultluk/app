@@ -69,7 +69,7 @@ const BatchDetails = ({ navigation }) => {
                 onPress={() => navigation.navigate("Settings")} /> */}
                 <View style={globalStyles.headerRow}>
 
-                    <Text style={globalStyles.title}>BatchDetails</Text>
+                    <Text style={globalStyles.title}>Batch Details</Text>
                     <Icon 
                         name="cog"
                         type="font-awesome"
