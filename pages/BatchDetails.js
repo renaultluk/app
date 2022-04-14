@@ -70,6 +70,10 @@ const BatchDetails = ({ navigation }) => {
                 <View style={globalStyles.headerRow}>
 
                     <Text style={globalStyles.title}>Batch Details</Text>
+                    <Button
+                        title="+ Add"
+                        onPress={() => navigation.navigate("ScanCargo")}
+                    />
                     <Icon 
                         name="cog"
                         type="font-awesome"

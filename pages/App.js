@@ -14,6 +14,7 @@ import DeliveryMap from './Map';
 import BatchDetails from './BatchDetails';
 import Settings from './Settings';
 import Sign from './Sign';
+import ScanCargo from './ScanCargo';
 
 import colors from '../styles/colors';
 
@@ -82,6 +83,12 @@ export default function App() {
         />
         <MainStack.Screen name="Sign"
           component={Sign}
+          options={{
+            headerShown: true,
+          }}
+        />
+        <MainStack.Screen name="ScanCargo"
+          component={ScanCargo}
           options={{
             headerShown: true,
           }}
