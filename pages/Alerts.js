@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Alert, FlatList } from 'react-native';
 import { ListItem } from 'react-native-elements';
 
 import AlertsListItem from '../components/AlertsListItem';
+
+import { db } from '../utils/firebase';
+import { ref, get, child } from 'firebase/database';
 
 import globalStyles from '../styles/global';
 import styles from '../styles/pages/Alerts.js';
@@ -26,6 +29,30 @@ const Alerts = () => {
     const refreshData = () => {
 
     }
+
+    const fetchData = async () => {
+        const alertRef = ref(db, 'issues/pending');
+        get(alertRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                console.log(obj);
+                const arrKeys = Object.keys(obj);
+                const objArr = Object.values(obj);
+                // objArr.shift();
+                const localData = objArr;
+                localData.forEach((alert, index) => {
+                    alert['id'] = arrKeys[index];
+                })
+                console.log(localData);
+                setData(localData);
+            }
+        })
+    }
+
+    useEffect(() => {
+        fetchData().catch((error) => console.log(error));
+    }, []);
+
     const resolveIssue = (item) => {
         console.log("resolved");
         setData([...data.filter(i => i.id !== item.id)])
@@ -62,7 +89,7 @@ const Alerts = () => {
                 (item, index) => (
                     <ListItem key={index} bottomDivider onPress={() => onItemPress(item)}>
                         <ListItem.Content>
-                            <ListItem.Title>{item.name}</ListItem.Title>
+                            <ListItem.Title>{item['cargo-id']}</ListItem.Title>
                             <ListItem.Subtitle>{item.issue}</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />

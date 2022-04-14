@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Alert, Button, FlatList } from "react-native";
 // import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Icon, ListItem } from "react-native-elements";
+import { db } from "../utils/firebase";
+import { ref, get, child } from "firebase/database";
 
 import BatchListItem from "../components/BatchListItem";
 import globalStyles from "../styles/global";
 
 const BatchDetails = ({ navigation }) => {
-    const [batch, setBatch] = useState([
+    const [batches, setBatches] = useState([
         {
             name: "Carton 1",
             id: 1,
@@ -22,9 +24,29 @@ const BatchDetails = ({ navigation }) => {
         }
 ]);
     
-    const refreshData = () => {
-
+    const fetchData = async () => {
+        const batchRef = ref(db, 'batches/pending');
+        get(batchRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                console.log(obj);
+                const arrKeys = Object.keys(obj);
+                const objArr = Object.values(obj);
+                // objArr.shift();
+                const localBatches = objArr;
+                localBatches.forEach((batch, index) => {
+                    batch['id'] = arrKeys[index];
+                })
+                console.log(localBatches);
+                setBatches(localBatches);
+            }
+        })
     }
+
+    useEffect(() => {
+        fetchData().catch((error) => console.log(error));
+    }, []);
+    
 
     const signOff = (item) => {
         navigation.navigate("Sign");
@@ -34,7 +56,7 @@ const BatchDetails = ({ navigation }) => {
         const subtitle = item.safe ? "safe" : item.issue;
         
         Alert.alert(
-            item.name,
+            item.batchID,
             subtitle,
             [
                 {text: 'Cancel', style: 'cancel'},
@@ -83,17 +105,17 @@ const BatchDetails = ({ navigation }) => {
                     />
                 </View>
             {
-                batch.map(
+                batches.map(
                     (item, index) => (
                         <ListItem key={index} bottomDivider onPress={() => onItemPress(item)}>
                             <ListItem.Content>
-                                <ListItem.Title>{item.name}</ListItem.Title>
-                                <ListItem.Subtitle>
+                                <ListItem.Title>{item.batchID}</ListItem.Title>
+                                {/* <ListItem.Subtitle>
                                     {
                                         item.safe ? "safe" :
                                         item.issue
                                     }
-                                </ListItem.Subtitle>
+                                </ListItem.Subtitle> */}
                             </ListItem.Content>
                             <ListItem.Chevron />
                         </ListItem>
