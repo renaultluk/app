@@ -2,9 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
+import useIDStore from '../utils/useIDStore.js';
+import { db } from '../utils/firebase';
+import { ref, get, child, set } from 'firebase/database';
+
 import styles from '../styles/pages/ScanCargo.js';
 
 const ScanCargo = () => {
+  const IDStore = useIDStore();
+  
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
@@ -15,9 +21,30 @@ const ScanCargo = () => {
     })();
   }, []);
 
+  const fetchData = async (index) => {
+      const batchRef = ref(db, `batches/pending/${index}`);
+        get(batchRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                return obj;
+            }
+            return null;
+        })
+}
+
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+
+    existingBatch = fetchData(data);
+    if (existingBatch) {
+      existingBatch['truckID'] = IDStore.truckID;
+      const batchRef = ref(db, `batches/pending/${data}`);
+      set(batchRef, existingBatch).then(() => {
+          alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
+      });
+    } else {
+        alert(`Can't post to firebase`);
+    }
   };
 
   if (hasPermission === null) {
