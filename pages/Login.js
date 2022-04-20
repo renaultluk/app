@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { View, Text, TextInput, Button, KeyboardAvoidingView } from "react-native";
 import { NavigationContainer, StackActions } from "@react-navigation/native";
 
+import { db } from "../utils/firebase";
+import { ref, get, child, set } from "firebase/database";
+
 import useIDStore from "../utils/useIDStore";
 
 import globalStyles from "../styles/global";
@@ -12,9 +15,25 @@ const Login = ({ navigation }) => {
     const [truckID, setTruckID] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {
-        IDStore.saveTruckID(truckID);
-        navigation.navigate("Main");
+    const handleLogin = async () => {
+        const truckRef = ref(db, `trucks`);
+        get(truckRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                for (let key in obj) {
+                    console.log(obj[key]);
+                    if (obj[key].ID === truckID && obj[key].password === password) {
+                        IDStore.saveTruckID(truckID);
+                        navigation.navigate("Main");
+                        return;
+                    }
+                }
+                alert("Invalid credentials");
+            }
+        });
+        
+        // IDStore.saveTruckID(truckID);
+        // navigation.navigate("Main");
     }
 
     return (
