@@ -52,18 +52,17 @@ const ScanCargo = () => {
       const batchRef = ref(db, `batches/pending/${data}`);
       set(batchRef, existingBatch).then(() => {
         targetTruck = fetchTruckData(IDStore.truckID);
-        if ((existingBatch.requiresTemp && !targetTruck.requiresTemp) || (existingBatch.requiresHumidity && !targetTruck.requiresHumidity)) {
-          targetTruck['requiresTemp'] = existingBatch.requiresTemp;
-          targetTruck['requiresHumidity'] = existingBatch.requiresHumidity;
-          targetTruck['tempLowerBound'] = existingBatch.tempLowerBound;
-          targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
-          targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
-          targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
-          const truckRef = ref(db, `trucks/${IDStore.truckID}`);
-          set(truckRef, targetTruck).then(() => {
-            alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
-          })
-        }  
+        
+        targetTruck['requiresTemp'] = existingBatch.requiresTemp;
+        targetTruck['requiresHumidity'] = existingBatch.requiresHumidity;
+        targetTruck['tempLowerBound'] = existingBatch.tempLowerBound;
+        targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
+        targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
+        targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
+        const truckRef = ref(db, `trucks/${IDStore.truckID}`);
+        set(truckRef, targetTruck).then(() => {
+          alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
+        })  
       });
     } else {
         alert(`Can't post to firebase`);
