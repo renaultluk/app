@@ -5,7 +5,7 @@ import { ListItem } from 'react-native-elements';
 import AlertsListItem from '../components/AlertsListItem';
 
 import { db } from '../utils/firebase';
-import { ref, get, child } from 'firebase/database';
+import { ref, get, child, onValue } from 'firebase/database';
 
 import globalStyles from '../styles/global';
 import styles from '../styles/pages/Alerts.js';
@@ -51,6 +51,25 @@ const Alerts = () => {
 
     useEffect(() => {
         fetchData().catch((error) => console.log(error));
+        
+        const alertListenerRef = ref(db, 'issues/pending');
+        onValue(alertListenerRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                console.log(obj);
+                const arrKeys = Object.keys(obj);
+                const objArr = Object.values(obj);
+                // objArr.shift();
+                const localData = objArr;
+                localData.forEach((alert, index) => {
+                    alert['id'] = arrKeys[index];
+                })
+                console.log(localData);
+                setData(localData);
+            }
+        })
+
+        return alertListenerRef.off();
     }, []);
 
     const resolveIssue = (item) => {
