@@ -14,6 +14,7 @@ const Login = ({ navigation }) => {
     
     const [truckID, setTruckID] = useState("");
     const [password, setPassword] = useState("");
+    const [phone, setPhone] = useState("");
 
     const handleLogin = async () => {
         const truckRef = ref(db, `trucks`);
@@ -23,9 +24,16 @@ const Login = ({ navigation }) => {
                 for (let key in obj) {
                     console.log(obj[key]);
                     if (obj[key].ID === truckID && obj[key].password === password) {
-                        IDStore.saveTruckID(truckID);
-                        navigation.navigate("Main");
-                        return;
+                        const phoneRef = ref(db, `drivers/${phone}`);
+                        get(phoneRef).then((snapshot) => {
+                            if (snapshot.exists()) {
+                                const driverObj = snapshot.val();
+                                IDStore.saveID(truckID);
+                                IDStore.saveDriver(driverObj);
+                                navigation.navigate("Home");
+                                return;
+                            }
+                        })
                     }
                 }
                 alert("Invalid credentials");
@@ -44,6 +52,7 @@ const Login = ({ navigation }) => {
             <Text style={globalStyles.title}>Login</Text>
             <TextInput placeholder="Truck ID" onChangeText={(text) => setTruckID(text)} style={globalStyles.input} />
             <TextInput placeholder="Password" onChangeText={(text) => setPassword(text)} style={globalStyles.input} />
+            <TextInput placeholder="Phone Number" onChangeText={(text) => setPhone(text)} style={globalStyles.input} />
             <Button title="Login" onPress={handleLogin} />
         </KeyboardAvoidingView>
     );

@@ -21,7 +21,7 @@ const ScanCargo = () => {
     })();
   }, []);
 
-  const fetchData = async (index) => {
+  const fetchBatchData = async (index) => {
       const batchRef = ref(db, `batches/pending/${index}`);
         get(batchRef).then((snapshot) => {
             if (snapshot.exists()) {
@@ -30,17 +30,40 @@ const ScanCargo = () => {
             }
             return null;
         })
-}
+  }
+
+  const fetchTruckData = async (index) => {
+      const truckRef = ref(db, `trucks/${index}`);
+        get(truckRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                return obj;
+            }
+            return null;
+        })
+  }
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
 
-    existingBatch = fetchData(data);
+    existingBatch = fetchBatchData(data);
     if (existingBatch) {
       existingBatch['truckID'] = IDStore.truckID;
       const batchRef = ref(db, `batches/pending/${data}`);
       set(batchRef, existingBatch).then(() => {
-          alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
+        targetTruck = fetchTruckData(IDStore.truckID);
+        if ((existingBatch.requiresTemp && !targetTruck.requiresTemp) || (existingBatch.requiresHumidity && !targetTruck.requiresHumidity)) {
+          targetTruck['requiresTemp'] = existingBatch.requiresTemp;
+          targetTruck['requiresHumidity'] = existingBatch.requiresHumidity;
+          targetTruck['tempLowerBound'] = existingBatch.tempLowerBound;
+          targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
+          targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
+          targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
+          const truckRef = ref(db, `trucks/${IDStore.truckID}`);
+          set(truckRef, targetTruck).then(() => {
+            alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
+          })
+        }  
       });
     } else {
         alert(`Can't post to firebase`);

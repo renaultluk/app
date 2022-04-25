@@ -6,7 +6,9 @@ const useIDStore = create(
     (set, get) => ({
         truckID: '',
         password: '',
+        driver: {},
         saveTruckID: (truckID) => set(state => ({ ...state, truckID })),
+        saveDriver: (driver) => set(state => ({ ...state, driver })),
     }), {
         name: 'Donations'
     }
