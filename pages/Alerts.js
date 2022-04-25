@@ -53,7 +53,7 @@ const Alerts = () => {
         fetchData().catch((error) => console.log(error));
         
         const alertListenerRef = ref(db, 'issues/pending');
-        onValue(alertListenerRef).then((snapshot) => {
+        onValue(alertListenerRef, (snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
                 console.log(obj);
@@ -69,7 +69,7 @@ const Alerts = () => {
             }
         })
 
-        return alertListenerRef.off();
+        return () => alertListenerRef.off();
     }, []);
 
     const resolveIssue = (item) => {
