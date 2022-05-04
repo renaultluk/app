@@ -39,12 +39,12 @@ const BatchDetails = ({ navigation }) => {
                 const arrKeys = Object.keys(obj);
                 const objArr = Object.values(obj);
                 // objArr.shift();
-                const localBatches = objArr;
-                localBatches.forEach((batch, index) => {
-                    batch['id'] = arrKeys[index];
-                })
-                console.log(localBatches);
-                setBatches(localBatches);
+                // const localBatches = objArr;
+                // localBatches.forEach((batch, index) => {
+                //     batch['id'] = arrKeys[index];
+                // })
+                // console.log(localBatches);
+                setBatches(objArr);
             } else {
                 setBatches([]);
             }
@@ -63,22 +63,38 @@ const BatchDetails = ({ navigation }) => {
         navigation.navigate("Sign");
     }
 
-    const onItemPress = (item) => {
-        const subtitle = item.safe ? "safe" : item.issue;
+    const onItemPress = async (item) => {
+        console.log(item);
         
-        Alert.alert(
-            item.batchID,
-            subtitle,
-            delivered ?
-            [
-                {text: 'Cancel', style: 'cancel'},
-                {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
-            ] :
-            [
-                {text: 'Cancel', style: 'cancel'},
-                {text: 'Delivered', onPress: () => setDelivered(item), style: "default"},
-            ]
-        );
+        const batchRef = ref(db, `batches/pending/${item}`);
+        get(batchRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+
+                let subtitle = "Cartons:\n";
+                obj.cargo.forEach((carton) => {
+                    subtitle += `- ${carton}\n`;
+                });
+        
+                Alert.alert(
+                    item,
+                    subtitle,
+                    delivered ?
+                    [
+                        {text: 'Cancel', style: 'cancel'},
+                        {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
+                    ] :
+                    [
+                        {text: 'Cancel', style: 'cancel'},
+                        {text: 'Delivered', onPress: () => setDelivered(item), style: "default"},
+                    ]
+                );
+            } else {
+                Alert.alert(
+                    "Item not found"
+                );
+            }
+        });
     }
 
     // const keyExtractor = (item, index) => item.id.toString();
@@ -126,7 +142,7 @@ const BatchDetails = ({ navigation }) => {
                     (item, index) => (
                         <ListItem key={index} bottomDivider onPress={() => onItemPress(item)}>
                             <ListItem.Content>
-                                <ListItem.Title>{item.batchID}</ListItem.Title>
+                                <ListItem.Title>{item}</ListItem.Title>
                                 {/* <ListItem.Subtitle>
                                     {
                                         item.safe ? "safe" :
