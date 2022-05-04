@@ -59,6 +59,16 @@ const ScanCargo = () => {
         targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
         targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
         targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
+        targetTruck['isFragile'] = existingBatch.isFragile;
+        targetTruck['isUpright'] = existingBatch.isUpright;
+        if (targetTruck['batches'])
+        {
+          targetTruck['batches'].push(data);
+        }
+        else
+        {
+          targetTruck['batches'] = [data];
+        }
         const truckRef = ref(db, `trucks/${IDStore.truckID}`);
         set(truckRef, targetTruck).then(() => {
           alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);

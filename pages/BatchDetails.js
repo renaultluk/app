@@ -5,27 +5,33 @@ import { Icon, ListItem } from "react-native-elements";
 import { db } from "../utils/firebase";
 import { ref, get, child } from "firebase/database";
 
+import useIDStore from "../utils/useIDStore";
+
 import BatchListItem from "../components/BatchListItem";
 import globalStyles from "../styles/global";
 
 const BatchDetails = ({ navigation }) => {
+    const IDStore = useIDStore();
+
+    let delivered = false;
+    
     const [batches, setBatches] = useState([
-        {
-            name: "Carton 1",
-            id: 1,
-            safe: true,
-            issue: ""
-        },
-        {
-            name: "Carton 2",
-            id: 2,
-            safe: false,
-            issue: "Tipped over"
-        }
+        // {
+        //     name: "Carton 1",
+        //     id: 1,
+        //     safe: true,
+        //     issue: ""
+        // },
+        // {
+        //     name: "Carton 2",
+        //     id: 2,
+        //     safe: false,
+        //     issue: "Tipped over"
+        // }
 ]);
     
     const fetchData = async () => {
-        const batchRef = ref(db, 'batches/pending');
+        const batchRef = ref(db, `trucks/${IDStore.truckID}/batches`);
         get(batchRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
@@ -39,6 +45,8 @@ const BatchDetails = ({ navigation }) => {
                 })
                 console.log(localBatches);
                 setBatches(localBatches);
+            } else {
+                setBatches([]);
             }
         })
     }
@@ -47,6 +55,9 @@ const BatchDetails = ({ navigation }) => {
         fetchData().catch((error) => console.log(error));
     }, []);
     
+    const setDelivered = (item) => {
+
+    }
 
     const signOff = (item) => {
         navigation.navigate("Sign");
@@ -58,9 +69,14 @@ const BatchDetails = ({ navigation }) => {
         Alert.alert(
             item.batchID,
             subtitle,
+            delivered ?
             [
                 {text: 'Cancel', style: 'cancel'},
                 {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
+            ] :
+            [
+                {text: 'Cancel', style: 'cancel'},
+                {text: 'Delivered', onPress: () => setDelivered(item), style: "default"},
             ]
         );
     }
@@ -105,6 +121,7 @@ const BatchDetails = ({ navigation }) => {
                     />
                 </View>
             {
+                batches.length > 0 ?
                 batches.map(
                     (item, index) => (
                         <ListItem key={index} bottomDivider onPress={() => onItemPress(item)}>
@@ -126,6 +143,7 @@ const BatchDetails = ({ navigation }) => {
                     //     renderItem={renderItem}
                     //     keyExtractor={(item, index) => index.toString()}
                     // />
+                    : <Text>No batches</Text>
                 }
                 {/* <Button title="Deliver" onPress={ () => navigation.navigate("Sign") } /> */}
         </View>

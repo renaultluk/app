@@ -21,6 +21,7 @@ const Login = ({ navigation }) => {
         get(truckRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
+                console.log(obj);
                 for (let key in obj) {
                     console.log(obj[key]);
                     if (obj[key].ID === truckID && obj[key].password === password) {
@@ -28,9 +29,9 @@ const Login = ({ navigation }) => {
                         get(phoneRef).then((snapshot) => {
                             if (snapshot.exists()) {
                                 const driverObj = snapshot.val();
-                                IDStore.saveID(truckID);
+                                IDStore.saveTruckID(truckID);
                                 IDStore.saveDriver(driverObj);
-                                navigation.navigate("Home");
+                                navigation.navigate("Main");
                                 return;
                             }
                         })

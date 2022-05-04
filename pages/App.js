@@ -24,7 +24,7 @@ const PageTab = createMaterialBottomTabNavigator();
 const TabPages = () => {
   return (
     <PageTab.Navigator
-      initialRouteName="Map"
+      initialRouteName="Alerts"
       activeColor={colors.tabActiveColor}
       barStyle={{ backgroundColor: colors.primaryColor }}
     >
@@ -38,7 +38,7 @@ const TabPages = () => {
           ),
         }}
       />
-      <PageTab.Screen
+      {/* <PageTab.Screen
         name="Map"
         component={DeliveryMap}
         options={{
@@ -47,7 +47,7 @@ const TabPages = () => {
             <Icon name="map-marked-alt" color={color} size={20} />
           ),
         }}
-      />
+      /> */}
       <PageTab.Screen
         name="BatchDetails"
         component={BatchDetails}
