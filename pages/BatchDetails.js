@@ -3,7 +3,7 @@ import { View, Text, Alert, Button, FlatList } from "react-native";
 // import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Icon, ListItem } from "react-native-elements";
 import { db } from "../utils/firebase";
-import { ref, get, child } from "firebase/database";
+import { ref, get, child, update, onValue } from "firebase/database";
 
 import useIDStore from "../utils/useIDStore";
 
@@ -28,7 +28,7 @@ const BatchDetails = ({ navigation }) => {
         //     safe: false,
         //     issue: "Tipped over"
         // }
-]);
+    ]);
     
     const fetchData = async () => {
         const batchRef = ref(db, `trucks/${IDStore.truckID}/batches`);
@@ -53,14 +53,33 @@ const BatchDetails = ({ navigation }) => {
 
     useEffect(() => {
         fetchData().catch((error) => console.log(error));
+
+        const batchRef = ref(db, `trucks/${IDStore.truckID}/batches`);
+        onValue(batchRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const obj = snapshot.val();
+                console.log(obj);
+                const arrKeys = Object.keys(obj);
+                const objArr = Object.values(obj);
+                setBatches(objArr);
+            } else {
+                setBatches([]);
+            }
+        }).catch((error) => console.log(error));
+
+        return () => {
+            batchRef.off();
+        }
     }, []);
     
-    const setDelivered = (item) => {
-
+    const setDelivered = (obj) => {
+        const updates = {};
+        updates[`/batches/pending/${obj.batchID}/delivered`] = true;
+        return update(ref(db), updates);
     }
 
     const signOff = (item) => {
-        navigation.navigate("Sign");
+        navigation.navigate("Sign", { batchID: item });
     }
 
     const onItemPress = async (item) => {
@@ -71,7 +90,7 @@ const BatchDetails = ({ navigation }) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
 
-                let subtitle = "Cartons:\n";
+                let subtitle = `Address: ${obj.address}\n\nCartons:\n`;
                 obj.cargo.forEach((carton) => {
                     subtitle += `- ${carton}\n`;
                 });
@@ -79,14 +98,14 @@ const BatchDetails = ({ navigation }) => {
                 Alert.alert(
                     item,
                     subtitle,
-                    delivered ?
+                    obj.delivered ?
                     [
                         {text: 'Cancel', style: 'cancel'},
                         {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
                     ] :
                     [
                         {text: 'Cancel', style: 'cancel'},
-                        {text: 'Delivered', onPress: () => setDelivered(item), style: "default"},
+                        {text: 'Delivered', onPress: () => setDelivered(obj), style: "default"},
                     ]
                 );
             } else {
