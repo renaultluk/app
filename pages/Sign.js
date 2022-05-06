@@ -32,12 +32,13 @@ const Sign = ({ navigation }) => {
                 if (snapshot.exists()) {
                     const obj = snapshot.val();
                     truckArr = Object.values(obj);
-                    for (let i = 0; i < truckArr.length; i++) {
-                        if (truckArr[i].batchID === batchID) {
-                            truckArr.splice(i, 1);
-                            break;
-                        }
-                    }
+                    truckArr = [...truckArr.filter(i => i.batchID !== batchID)]
+                    // for (let i = 0; i < truckArr.length; i++) {
+                    //     if (truckArr[i].batchID === batchID) {
+                    //         truckArr.splice(i, 1);
+                    //         break;
+                    //     }
+                    // }
                 }
             })
         }).then(() => {

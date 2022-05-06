@@ -74,7 +74,10 @@ const Alerts = () => {
 
     const resolveIssue = (item) => {
         console.log("resolved");
-        setData([...data.filter(i => i.id !== item.id)])
+        setData([...data.filter(i => i.id !== item.id)]);
+        const updates = {};
+        updates[`/issues/pending/${item.id}/resolved`] = true;
+        update(ref(db), updates).catch((error) => console.log(error));
     }
 
     const onItemPress = (item) => {
