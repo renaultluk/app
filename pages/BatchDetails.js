@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Alert, Button, FlatList } from "react-native";
 // import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Icon, ListItem } from "react-native-elements";
-import { db } from "../utils/firebase";
+import { db, functions } from "../utils/firebase";
 import { ref, get, child, update, onValue } from "firebase/database";
+import { httpsCallable } from "firebase/functions";
 
 import useIDStore from "../utils/useIDStore";
 
@@ -73,9 +74,17 @@ const BatchDetails = ({ navigation }) => {
     }, []);
     
     const setDelivered = (obj) => {
-        const updates = {};
-        updates[`/batches/${obj.batchID}/deliveryStatus`] = "delivered";
-        return update(ref(db), updates);
+        // const updates = {};
+        // updates[`/batches/${obj.batchID}/deliveryStatus`] = "delivered";
+        // return update(ref(db), updates);
+        const deliveredCall = httpsCallable(functions, 'checkDelivered');
+        deliveredCall({ batchID: obj.batchID, truckID: IDStore.truckID }).then((res) => {
+            if (res.deliveredCheck) {
+                console.log('Delivered');
+            } else {
+                alert('Not Delivered');
+            }
+        });
     }
 
     const signOff = (item) => {
