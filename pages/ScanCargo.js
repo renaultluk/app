@@ -22,7 +22,7 @@ const ScanCargo = () => {
   }, []);
 
   const fetchBatchData = async (index) => {
-      const batchRef = ref(db, `batches/pending/${index}`);
+      const batchRef = ref(db, `batches/${index}`);
         get(batchRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
@@ -49,7 +49,7 @@ const ScanCargo = () => {
     existingBatch = fetchBatchData(data);
     if (existingBatch) {
       existingBatch['truckID'] = IDStore.truckID;
-      const batchRef = ref(db, `batches/pending/${data}`);
+      const batchRef = ref(db, `batches/${data}`);
       set(batchRef, existingBatch).then(() => {
         targetTruck = fetchTruckData(IDStore.truckID);
         
@@ -59,8 +59,6 @@ const ScanCargo = () => {
         targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
         targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
         targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
-        targetTruck['isFragile'] = existingBatch.isFragile;
-        targetTruck['isUpright'] = existingBatch.isUpright;
         if (targetTruck['batches'])
         {
           targetTruck['batches'].push(data);

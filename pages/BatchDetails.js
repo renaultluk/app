@@ -74,7 +74,7 @@ const BatchDetails = ({ navigation }) => {
     
     const setDelivered = (obj) => {
         const updates = {};
-        updates[`/batches/pending/${obj.batchID}/delivered`] = true;
+        updates[`/batches/${obj.batchID}/deliveryStatus`] = "delivered";
         return update(ref(db), updates);
     }
 
@@ -85,7 +85,7 @@ const BatchDetails = ({ navigation }) => {
     const onItemPress = async (item) => {
         console.log(item);
         
-        const batchRef = ref(db, `batches/pending/${item}`);
+        const batchRef = ref(db, `batches/${item}`);
         get(batchRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
@@ -98,7 +98,7 @@ const BatchDetails = ({ navigation }) => {
                 Alert.alert(
                     item,
                     subtitle,
-                    obj.delivered ?
+                    obj.deliveryStatus === "delivered" ?
                     [
                         {text: 'Cancel', style: 'cancel'},
                         {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
