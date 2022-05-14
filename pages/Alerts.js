@@ -69,7 +69,7 @@ const Alerts = () => {
             }
         })
 
-        return () => alertListenerRef.off();
+        // return () => alertListenerRef.off();
     }, []);
 
     const resolveIssue = (item) => {

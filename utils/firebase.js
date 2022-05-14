@@ -21,4 +21,4 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const db = getDatabase();
-export const functions = getFunctions();
+export const functions = getFunctions(app);

@@ -55,22 +55,22 @@ const BatchDetails = ({ navigation }) => {
     useEffect(() => {
         fetchData().catch((error) => console.log(error));
 
-        const batchRef = ref(db, `trucks/${IDStore.truckID}/batches`);
-        onValue(batchRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const obj = snapshot.val();
-                console.log(obj);
-                const arrKeys = Object.keys(obj);
-                const objArr = Object.values(obj);
-                setBatches(objArr);
-            } else {
-                setBatches([]);
-            }
-        }).catch((error) => console.log(error));
+        // const batchRef = ref(db, `trucks/${IDStore.truckID}/batches`);
+        // onValue(batchRef, (snapshot) => {
+        //     if (snapshot.exists()) {
+        //         const obj = snapshot.val();
+        //         console.log(obj);
+        //         const arrKeys = Object.keys(obj);
+        //         const objArr = Object.values(obj);
+        //         setBatches(objArr);
+        //     } else {
+        //         setBatches([]);
+        //     }
+        // }).catch((error) => console.log(error));
 
-        return () => {
-            batchRef.off();
-        }
+        // return () => {
+        //     batchRef.off();
+        // }
     }, []);
     
     const setDelivered = (obj) => {
@@ -100,29 +100,34 @@ const BatchDetails = ({ navigation }) => {
                 const obj = snapshot.val();
 
                 let subtitle = `Address: ${obj.address}\n\nCartons:\n`;
-                obj.cargo.forEach((carton) => {
-                    subtitle += `- ${carton}\n`;
-                });
+                // obj.cargo.forEach((carton) => {
+                //     subtitle += `- ${carton}\n`;
+                // });
         
                 Alert.alert(
                     item,
                     subtitle,
-                    obj.deliveryStatus === "delivered" ?
+                    // obj.deliveryStatus === "delivered" ?
                     [
                         {text: 'Cancel', style: 'cancel'},
                         {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
-                    ] :
-                    [
-                        {text: 'Cancel', style: 'cancel'},
-                        {text: 'Delivered', onPress: () => setDelivered(obj), style: "default"},
                     ]
+                    // :
+                    // [
+                    //     {text: 'Cancel', style: 'cancel'},
+                    //     {text: 'Delivered', onPress: () => setDelivered(obj), style: "default"},
+                    // ]
                 );
             } else {
                 Alert.alert(
                     "Item not found"
                 );
             }
-        });
+        }).catch(
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     // const keyExtractor = (item, index) => item.id.toString();
