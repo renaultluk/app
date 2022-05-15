@@ -66,7 +66,10 @@ const BatchDetails = ({ route, navigation }) => {
         //         const obj = snapshot.val();
         //         console.log(obj);
         //         const arrKeys = Object.keys(obj);
-        //         const objArr = Object.values(obj);
+        //         var objArr = Object.values(obj);
+        //         objArr = objArr.filter((batch) => {
+        //             return batch != filterBatch;
+        //         })
         //         setBatches(objArr);
         //     } else {
         //         setBatches([]);
@@ -91,7 +94,7 @@ const BatchDetails = ({ route, navigation }) => {
             if (res.data.deliveredCheck) {
                 Alert.alert('Delivered');
             } else {
-                Alert.alert('Not Delivered', `Distance: ${res.data.distance}`);
+                Alert.alert('Not Delivered', `You are ${res.data.distance}km away from actual destination.`);
             }
         });
     }
