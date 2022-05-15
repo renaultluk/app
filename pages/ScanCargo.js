@@ -4,7 +4,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import useIDStore from '../utils/useIDStore.js';
 import { db } from '../utils/firebase';
-import { ref, get, child, set } from 'firebase/database';
+import { ref, get, child, set, update } from 'firebase/database';
 
 import styles from '../styles/pages/ScanCargo.js';
 
@@ -28,7 +28,6 @@ const ScanCargo = () => {
                 const obj = snapshot.val();
                 return obj;
             }
-            return null;
         })
   }
 
@@ -39,42 +38,71 @@ const ScanCargo = () => {
                 const obj = snapshot.val();
                 return obj;
             }
-            return null;
+            // return null;
+        }).catch((error) => {
+          console.log(error);
         })
   }
 
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-
-    existingBatch = fetchBatchData(data);
+  const handleBarCodeScanned = async ({ type, data }) => {
+    
+    console.log(data);
+    var existingBatch = {};
+    get(ref(db, `batches/${data}`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        const obj = snapshot.val();
+        existingBatch = obj;
+      }
+    }).catch((error) => {
+      console.log(error);
+    });
+    console.log(existingBatch);
     if (existingBatch) {
-      existingBatch['truckID'] = IDStore.truckID;
+      const updates = {
+        truckID: IDStore.truckID,
+      };
       const batchRef = ref(db, `batches/${data}`);
-      set(batchRef, existingBatch).then(() => {
-        targetTruck = fetchTruckData(IDStore.truckID);
-        
-        targetTruck['requiresTemp'] = existingBatch.requiresTemp;
-        targetTruck['requiresHumidity'] = existingBatch.requiresHumidity;
-        targetTruck['tempLowerBound'] = existingBatch.tempLowerBound;
-        targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
-        targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
-        targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
-        if (targetTruck['batches'])
-        {
-          targetTruck['batches'].push(data);
-        }
-        else
-        {
-          targetTruck['batches'] = [data];
-        }
-        const truckRef = ref(db, `trucks/${IDStore.truckID}`);
-        set(truckRef, targetTruck).then(() => {
-          alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
-        })  
+      await update(batchRef, updates).catch((error) => {
+        console.log(error);
       });
+      const truckUpdates = {
+        requiresTemp: existingBatch.requiresTemp,
+        requiresHumidity: existingBatch.requiresHumidity,
+        tempLowerBound: existingBatch.tempLowerBound,
+        tempUpperBound: existingBatch.tempUpperBound,
+        humidityLowerBound: existingBatch.humidityLowerBound,
+        humidityUpperBound: existingBatch.humidityUpperBound,
+      };
+      const truckRef = ref(db, `trucks/${IDStore.truckID}`);
+      await update(truckRef, truckUpdates).catch((error) => {
+        console.log(error);
+      });
+      const newBatchRef = ref(db, `trucks/${IDStore.truckID}/batches/${data}`);
+      await set(newBatchRef, data).catch((error) => {
+        console.log(error);
+      });
+      // targetTruck = fetchTruckData(IDStore.truckID);
+      
+      // targetTruck['requiresTemp'] = existingBatch.requiresTemp;
+      // targetTruck['requiresHumidity'] = existingBatch.requiresHumidity;
+      // targetTruck['tempLowerBound'] = existingBatch.tempLowerBound;
+      // targetTruck['tempUpperBound'] = existingBatch.tempUpperBound;
+      // targetTruck['humidityLowerBound'] = existingBatch.humidityLowerBound;
+      // targetTruck['humidityUpperBound'] = existingBatch.humidityUpperBound;
+      // if (targetTruck['batches'])
+      // {
+        //   targetTruck['batches'].push(data);
+      // }
+      // else
+      // {
+        //   targetTruck['batches'] = [data];
+      // }
+      // const truckRef = ref(db, `trucks/${IDStore.truckID}`);
+      alert(`Batch ${data} has been paired with truck ${IDStore.truckID}`);
     } else {
-        alert(`Can't post to firebase`);
+      alert(`Can't post to firebase`);
     }
+    setScanned(true);
   };
 
   if (hasPermission === null) {

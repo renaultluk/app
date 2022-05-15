@@ -5,7 +5,7 @@ import { ListItem } from 'react-native-elements';
 import AlertsListItem from '../components/AlertsListItem';
 
 import { db } from '../utils/firebase';
-import { ref, get, child, onValue } from 'firebase/database';
+import { ref, get, child, onValue, update } from 'firebase/database';
 
 import globalStyles from '../styles/global';
 import styles from '../styles/pages/Alerts.js';
@@ -31,7 +31,7 @@ const Alerts = () => {
     }
 
     const fetchData = async () => {
-        const alertRef = ref(db, 'issues/pending');
+        const alertRef = ref(db, 'issues');
         get(alertRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
@@ -42,7 +42,10 @@ const Alerts = () => {
                 const localData = objArr;
                 localData.forEach((alert, index) => {
                     alert['id'] = arrKeys[index];
-                })
+                });
+                localData.filter((alert) => {
+                    return alert.resolved != true;
+                });
                 console.log(localData);
                 setData(localData);
             }
@@ -52,7 +55,7 @@ const Alerts = () => {
     useEffect(() => {
         fetchData().catch((error) => console.log(error));
         
-        const alertListenerRef = ref(db, 'issues/pending');
+        const alertListenerRef = ref(db, 'issues');
         onValue(alertListenerRef, (snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
@@ -74,16 +77,18 @@ const Alerts = () => {
 
     const resolveIssue = (item) => {
         console.log("resolved");
-        setData([...data.filter(i => i.id !== item.id)]);
+        setData([...data.filter(i => {
+            return i.id !== item.id;
+        })]);
         const updates = {};
-        updates[`/issues/pending/${item.id}/resolved`] = true;
+        updates[`/issues/${item.id}/resolved`] = true;
         update(ref(db), updates).catch((error) => console.log(error));
     }
 
     const onItemPress = (item) => {
         Alert.alert(
             item.name,
-            `${item.issue} Corresponding Data: ${item.data}`,
+            `${item.issue}`,
             [
                 {text: 'Cancel', style: 'cancel'},
                 {text: 'Resolved', onPress: () => resolveIssue(item), style: "default"},
@@ -111,7 +116,7 @@ const Alerts = () => {
                 (item, index) => (
                     <ListItem key={index} bottomDivider onPress={() => onItemPress(item)}>
                         <ListItem.Content>
-                            <ListItem.Title>{item['cargo-id']}</ListItem.Title>
+                            <ListItem.Title>{item['id']}</ListItem.Title>
                             <ListItem.Subtitle>{item.issue}</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />
