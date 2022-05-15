@@ -51,6 +51,7 @@ const TabPages = () => {
       <PageTab.Screen
         name="BatchDetails"
         component={BatchDetails}
+        initialParams={{ filterBatch: '' }}
         options={{
           tabBarLabel: "Cargo",
           tabBarIcon: ({ color }) => (

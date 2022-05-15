@@ -17,27 +17,29 @@ const Login = ({ navigation }) => {
     const [phone, setPhone] = useState("");
 
     const handleLogin = async () => {
-        const truckRef = ref(db, `trucks`);
+        const truckRef = ref(db, `trucks/${truckID}`);
+        var found = false;
         get(truckRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
                 console.log(obj);
-                for (let key in obj) {
-                    console.log(obj[key]);
-                    if (obj[key].ID === truckID && obj[key].password === password) {
-                        const phoneRef = ref(db, `drivers/${phone}`);
-                        get(phoneRef).then((snapshot) => {
-                            if (snapshot.exists()) {
-                                const driverObj = snapshot.val();
-                                IDStore.saveTruckID(truckID);
-                                IDStore.saveDriver(driverObj);
-                                navigation.navigate("Main");
-                                return;
-                            }
-                        })
-                    }
+                if (obj.truckID === truckID && obj.password === password) {
+                    const phoneRef = ref(db, `drivers/${phone}`);
+                    get(phoneRef).then((snapshot) => {
+                        if (snapshot.exists()) {
+                            found = true;
+                            const driverObj = snapshot.val();
+                            IDStore.saveTruckID(truckID);
+                            IDStore.saveDriver(driverObj);
+                            navigation.navigate("Main");
+                            return;
+                        }
+                    }).then(() => {
+                        if (!found) alert("Invalid credentials");
+                    })
                 }
-                alert("Invalid credentials");
+            } else {
+                alert("No trucks found");
             }
         });
         

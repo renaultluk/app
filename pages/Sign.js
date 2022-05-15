@@ -55,7 +55,7 @@ const Sign = ({ route, navigation }) => {
             console.log(res);
             if (res.data.data.signOffSuccessful) {
                 Alert.alert('Sign off successful');
-                navigation.navigate("BatchDetails");
+                navigation.navigate("BatchDetails", { filterBatch: batchID });
             } else {
                 Alert.alert('Sign off failed');
             }

@@ -11,8 +11,10 @@ import useIDStore from "../utils/useIDStore";
 import BatchListItem from "../components/BatchListItem";
 import globalStyles from "../styles/global";
 
-const BatchDetails = ({ navigation }) => {
+const BatchDetails = ({ route, navigation }) => {
     const IDStore = useIDStore();
+
+    const filterBatch = route.params.filterBatch;
 
     let delivered = false;
     
@@ -38,13 +40,16 @@ const BatchDetails = ({ navigation }) => {
                 const obj = snapshot.val();
                 console.log(obj);
                 const arrKeys = Object.keys(obj);
-                const objArr = Object.values(obj);
+                var objArr = Object.values(obj);
                 // objArr.shift();
                 // const localBatches = objArr;
                 // localBatches.forEach((batch, index) => {
                 //     batch['id'] = arrKeys[index];
                 // })
                 // console.log(localBatches);
+                objArr = objArr.filter((batch) => {
+                    return batch != filterBatch;
+                })
                 setBatches(objArr);
             } else {
                 setBatches([]);
@@ -78,11 +83,15 @@ const BatchDetails = ({ navigation }) => {
         // updates[`/batches/${obj.batchID}/deliveryStatus`] = "delivered";
         // return update(ref(db), updates);
         const deliveredCall = httpsCallable(functions, 'checkDelivered');
-        deliveredCall({ batchID: obj.batchID, truckID: IDStore.truckID }).then((res) => {
-            if (res.deliveredCheck) {
-                console.log('Delivered');
+        console.log(IDStore.truckID);
+        console.log(obj);
+        deliveredCall({ batchID: obj.id, truckID: IDStore.truckID }).then((res) => {
+            console.log("resed");
+            console.log(res);
+            if (res.data.deliveredCheck) {
+                Alert.alert('Delivered');
             } else {
-                alert('Not Delivered');
+                Alert.alert('Not Delivered', `Distance: ${res.data.distance}`);
             }
         });
     }
@@ -99,24 +108,28 @@ const BatchDetails = ({ navigation }) => {
             if (snapshot.exists()) {
                 const obj = snapshot.val();
 
-                let subtitle = `Address: ${obj.address}\n\nCartons:\n`;
-                // obj.cargo.forEach((carton) => {
-                //     subtitle += `- ${carton}\n`;
-                // });
+                let subtitle = `Address: ${obj.address}`;
+                if (obj.cargo) {
+                    subtitle += "\n\nCartons:\n";
+                    const cargo = Object.keys(obj.cargo);
+                    cargo.forEach((carton) => {
+                        subtitle += `- ${carton}\n`;
+                    });
+                }
         
                 Alert.alert(
-                    item,
+                    item + '',
                     subtitle,
-                    // obj.deliveryStatus === "delivered" ?
+                    obj.deliveryStatus === "delivered" ?
                     [
                         {text: 'Cancel', style: 'cancel'},
                         {text: 'Sign off batch', onPress: () => signOff(item), style: "default"},
                     ]
-                    // :
-                    // [
-                    //     {text: 'Cancel', style: 'cancel'},
-                    //     {text: 'Delivered', onPress: () => setDelivered(obj), style: "default"},
-                    // ]
+                    :
+                    [
+                        {text: 'Cancel', style: 'cancel'},
+                        {text: 'Delivered', onPress: () => setDelivered(obj), style: "default"},
+                    ]
                 );
             } else {
                 Alert.alert(
